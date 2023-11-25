@@ -1,20 +1,20 @@
 from z3 import *
 
 
-def TesteDimensões(mapa, r, s):
-    if r == len(mapa) and s == len(mapa[0]):
+def TesteDimensões(String, r, s):
+    if r == len(String) and s == len(String[0]):
         return
     else:
         print("As dimensões não coincidem.")
         exit()
 
 
-def SubstituirContarT(string):
+def SubstituirContarT(String):
     contagemt = 0
     resultado = ""
     numerot = 0
 
-    for linha in string:
+    for linha in String:
         for caractere in linha:
             if caractere == "T":
                 contagemt += 1
@@ -27,17 +27,17 @@ def SubstituirContarT(string):
     return numerot, resultado
 
 
-def VerificarAtacantes(string):
+def VerificarAtacantes(String):
     contadork = 0
     contadorj = 0
     contadort = 0
-    for linha in string:
+    for linha in String:
         for caractere in linha:
             if caractere == "n":
                 Solver.add(
                     Or(
-                        AcharTHorizontal(string, contadork, contadorj, contadort),
-                        AcharTVertical(string, contadork, contadorj),
+                        AcharTHorizontal(String, contadork, contadorj, contadort),
+                        AcharTVertical(String, contadork, contadorj),
                     )
                 )
             contadorj += 1
@@ -45,62 +45,104 @@ def VerificarAtacantes(string):
         contadork += 1
 
 
-def VerificarFogoCrusado(string):
+def VerificarFogoCruzado(String):
     contadork = 0
     contadorj = 0
     contadort = 0
-    for linha in string:
+    for linha in String:
         for caractere in linha:
-            for i in range(1, total_t + 1):
+            for i in range(1, TotalT + 1):
                 if caractere == f"{i}":
                     Solver.add(
                         Not(
-                            AcharTHorizontal(string, contadork, contadorj, contadort, i)
+                            AcharTHorizontal(String, contadork, contadorj, contadort, i)
                         )
                     )
-                    Solver.add(Not(AcharTVertical(string, contadork, contadorj, i)))
+                    Solver.add(Not(AcharTVertical(String, contadork, contadorj, i)))
             contadorj += 1
         contadorj = 0
         contadork += 1
 
 
-def AcharTHorizontal(string, contadork, contadorj, contadort, index=0):
+def FormarMapaValorado(String):
+    resultado = []
+    MapaValorado = ""
+    contagem = 1
+    for w in range(0, TotalT):
+        if (
+            m[VarVer[w]] == False
+            and m[VarHor[w]] == True
+            or (m[VarVer[w]] == False and m[VarHor[w]] == None)
+        ):
+            resultado.append(1)
+        elif (
+            m[VarVer[w]] == False
+            and m[VarHor[w]] == False
+            or (m[VarVer[w]] == None and m[VarHor[w]] == True)
+        ):
+            resultado.append(2)
+        elif (
+            m[VarVer[w]] == True
+            and m[VarHor[w]] == False
+            or (m[VarVer[w]] == True and m[VarHor[w]] == None)
+        ):
+            resultado.append(3)
+        elif (
+            m[VarVer[w]] == True
+            and m[VarHor[w]] == True
+            or (m[VarVer[w]] == None and m[VarHor[w]] == True)
+        ):
+            resultado.append(4)
+    for linha in String:
+        for caractere in linha:
+            if caractere == f"{contagem}":
+                MapaValorado += str(resultado[contagem - 1])
+                contagem += 1
+            else:
+                MapaValorado += caractere
+        MapaValorado += "\n"
+    return MapaValorado
+
+
+def AcharTHorizontal(String, contadork, contadorj, contadort, index=0):
     contador = 0
     castelo = False
-    fogocrusado = False
-    for caractere in string[contadork]:
-        for f in range(1, total_t + 1):
+    fogoCruzado = False
+    for caractere in String[contadork]:
+        for f in range(1, TotalT + 1):
             if caractere == f"{f}" and int(caractere) != index:
                 if contadorj < contadort:
                     i = contador
                     while i != contadorj:
-                        if string[contadork][i] == "#":
+                        if String[contadork][i] == "#":
                             castelo = True
                         elif (
-                            string[contadork][i].isdecimal()
-                            and int(string[contadork][i]) != f
+                            String[contadork][i].isdecimal()
+                            and int(String[contadork][i]) != f
+                            and index == 0
                         ):
-                            fogocrusado = True
+                            fogoCruzado = True
                         i -= 1
-                    if castelo == False and fogocrusado == False:
+                    if castelo == False and fogoCruzado == False:
                         return VarHor[f - 1]
                     else:
                         castelo = False
-                        fogocrusado = False
+                        fogoCruzado = False
                         continue
                 else:
                     for k in range(contador, contadorj):
-                        if string[contadork][k] == "#":
+                        if String[contadork][k] == "#":
                             castelo = True
                         elif (
-                            string[contadork][k].isdecimal()
-                            and int(string[contadork][k]) != f
+                            String[contadork][k].isdecimal()
+                            and int(String[contadork][k]) != f
+                            and index == 0
                         ):
-                            fogocrusado = True
-                    if castelo == False and fogocrusado == False:
+                            fogoCruzado = True
+                    if castelo == False and fogoCruzado == False:
                         return Not(VarHor[f - 1])
                     else:
-                        fogocrusado = False
+                        fogoCruzado = False
                         castelo = False
                         continue
         contador += 1
@@ -109,38 +151,42 @@ def AcharTHorizontal(string, contadork, contadorj, contadort, index=0):
     return False
 
 
-def AcharTVertical(string, contadork, contadorj, index=0):
+def AcharTVertical(String, contadork, contadorj, index=0):
     castelo = False
-    fogocrusado = False
+    fogoCruzado = False
     for i in range(0, r):
-        for l in range(1, total_t + 1):
-            if string[i][contadorj] == f"{l}" and int(string[i][contadorj]) != index:
+        for l in range(1, TotalT + 1):
+            if String[i][contadorj] == f"{l}" and int(String[i][contadorj]) != index:
                 if contadork < i:
                     for k in range(contadork, i):
-                        if string[k][contadorj] == "#":
+                        if String[k][contadorj] == "#":
                             castelo = True
-                        elif (string[k][contadorj].isdecimal()) and int(
-                            string[k][contadorj]
-                        ) != l:
-                            fogocrusado = True
-                    if castelo == False and fogocrusado == False:
+                        elif (
+                            (String[k][contadorj].isdecimal())
+                            and int(String[k][contadorj]) != l
+                            and index == 0
+                        ):
+                            fogoCruzado = True
+                    if castelo == False and fogoCruzado == False:
                         return VarVer[l - 1]
                     else:
-                        fogocrusado = False
+                        fogoCruzado = False
                         castelo = False
                         continue
                 else:
                     for k in range(i, contadork):
-                        if string[k][contadorj] == "#":
+                        if String[k][contadorj] == "#":
                             castelo = True
-                        elif (string[k][contadorj].isdecimal()) and int(
-                            string[k][contadorj]
-                        ) != l:
-                            fogocrusado = True
-                    if castelo == False and fogocrusado == False:
+                        elif (
+                            (String[k][contadorj].isdecimal())
+                            and int(String[k][contadorj]) != l
+                            and index == 0
+                        ):
+                            fogoCruzado = True
+                    if castelo == False and fogoCruzado == False:
                         return Not(VarVer[l - 1])
                     else:
-                        fogocrusado = False
+                        fogoCruzado = False
                         castelo = False
                         continue
     return False
@@ -163,22 +209,21 @@ r, s = dimensoes[0], dimensoes[1]
 mapa = linhas[1:]
 
 TesteDimensões(mapa, r, s)
-total_t, mapa = SubstituirContarT(mapa)
+TotalT, mapa = SubstituirContarT(mapa)
 
 mapa = mapa.split("\n")
 mapa = mapa[0:r]
 
 Solver = Solver()
-VarHor = [Bool("t" + str(i) + "e") for i in range(1, total_t + 1)]
-VarVer = [Bool("t" + str(i) + "c") for i in range(1, total_t + 1)]
+VarHor = [Bool("t" + str(i) + "e") for i in range(1, TotalT + 1)]
+VarVer = [Bool("t" + str(i) + "c") for i in range(1, TotalT + 1)]
 
 VerificarAtacantes(mapa)
-VerificarFogoCrusado(mapa)
-
-print(Solver.assertions())
+VerificarFogoCruzado(mapa)
 
 if Solver.check() == sat:
-    print(Solver.model())
-    print("Fórmula Satisfatível")
+    m = Solver.model()
 else:
     print("Fórmula Insatisfatível")
+
+print(FormarMapaValorado(mapa))
