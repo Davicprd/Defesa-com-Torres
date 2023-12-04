@@ -2,6 +2,18 @@ from z3 import *
 
 
 def TestDimensions(String, r, s):
+    """
+    Checks if the dimensions of the map match the given parameters.
+
+    Args:
+    - String: The map layout as a list of strings.
+    - r: The expected number of rows.
+    - s: The expected number of columns.
+
+    Returns:
+    - None
+    """
+
     if r == len(String) and s == len(String[0]):
         return
     else:
@@ -10,6 +22,17 @@ def TestDimensions(String, r, s):
 
 
 def ReplaceCountT(String):
+    """
+    Replaces towers ('T') in the map with sequential numbers.
+
+    Args:
+    - String: The map layout as a list of strings.
+
+    Returns:
+    - number_t: The total number of towers.
+    - result: The map layout with towers replaced by numbers.
+    """
+
     count_t = 0
     result = ""
     number_t = 0
@@ -28,6 +51,16 @@ def ReplaceCountT(String):
 
 
 def CheckAttackers(String):
+    """
+    Adds constraints to the Z3 solver based on attacker positions in the map.
+
+    Args:
+    - String: The map layout as a list of strings.
+
+    Returns:
+    - None
+    """
+
     count_k = 0
     count_j = 0
     count_t = 0
@@ -46,6 +79,16 @@ def CheckAttackers(String):
 
 
 def CheckCrossFire(String):
+    """
+    Adds constraints to the Z3 solver to avoid crossfire among cannons.
+
+    Args:
+    - String: The map layout as a list of strings.
+
+    Returns:
+    - None
+    """
+    
     count_k = 0
     count_j = 0
     count_t = 0
@@ -65,6 +108,16 @@ def CheckCrossFire(String):
 
 
 def FormValuedMap(String):
+    """
+    Creates the final map with cannon orientations based on the solver's solution.
+
+    Args:
+    - String: The map layout as a list of strings.
+
+    Returns:
+    - Map with cannon orientations.
+    """
+
     result = []
     valuedMap = ""
     count = 1
@@ -105,6 +158,20 @@ def FormValuedMap(String):
 
 
 def FindHorizontalT(String, count_k, count_j, count_t, index=0):
+    """
+    Checks for horizontal obstacles (castle or crossfire) for a particular cannon.
+
+    Args:
+    - String: The map layout as a list of strings.
+    - row_index: Index of the row in the map.
+    - col_index: Index of the column in the map.
+    - total_towers: Total number of towers in the map.
+    - index: Index of the cannon (default: 0).
+
+    Returns:
+    - Boolean value representing constraints for the solver.
+    """
+
     count = 0
     castle = False
     crossFire = False
@@ -152,6 +219,20 @@ def FindHorizontalT(String, count_k, count_j, count_t, index=0):
 
 
 def FindVerticalT(String, count_k, count_j, index=0):
+    """
+    Checks for vertical obstacles (castle or crossfire) for a particular cannon.
+
+    Args:
+    - String: The map layout as a list of strings.
+    - row_index: Index of the row in the map.
+    - col_index: Index of the column in the map.
+    - total_towers: Total number of towers in the map.
+    - index: Index of the cannon (default: 0).
+
+    Returns:
+    - Boolean value representing constraints for the solver.
+    """
+    
     castle = False
     crossFire = False
     for i in range(0, r):
