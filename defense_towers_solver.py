@@ -29,25 +29,25 @@ def ReplaceCountT(String):
     - String: The map layout as a list of strings.
 
     Returns:
-    - number_t: The total number of towers.
+    - total_t: The total number of towers.
     - result: The map layout with towers replaced by numbers.
     """
 
-    tower_row = 0
+    # count_t = 0
     result = ""
-    number_t = 0
+    total_t = 0
 
-    for line in String:
-        for char in line:
+    for row in String:
+        for char in row:
             if char == "T":
-                tower_row += 1
-                result += str(tower_row)
-                number_t += 1
+                # count_t += 1
+                total_t += 1
+                result += str(total_t)
             else:
                 result += char
         result += "\n"
 
-    return number_t, result
+    return total_t, result
 
 
 def CheckAttackers(String):
@@ -64,8 +64,8 @@ def CheckAttackers(String):
     row_index = 0
     col_index = 0
     tower_row = 0
-    for line in String:
-        for char in line:
+    for row in String:
+        for char in row:
             if char == "n":
                 Solver.add(
                     Or(
@@ -92,8 +92,8 @@ def CheckCrossFire(String):
     row_index = 0
     col_index = 0
     tower_row = 0
-    for line in String:
-        for char in line:
+    for row in String:
+        for char in row:
             for i in range(1, TotalT + 1):
                 if char == f"{i}":
                     Solver.add(
@@ -146,8 +146,8 @@ def FormValuedMap(String):
             or (m[VarVer[w]] == None and m[VarHor[w]] == True)
         ):
             result.append(4)
-    for line in String:
-        for char in line:
+    for row in String:
+        for char in row:
             if char == f"{count}":
                 valuedMap += str(result[count - 1])
                 count += 1
@@ -285,10 +285,10 @@ nnnnnnnT
 nnnTn.n.
 .nTnnnnn"""
 
-lines = input_string.strip().split("\n")
-dimensions = list(map(int, lines[0].split()))
+rows = input_string.strip().split("\n")
+dimensions = list(map(int, rows[0].split()))
 r, s = dimensions[0], dimensions[1]
-map_data = lines[1:]
+map_data = rows[1:]
 
 TestDimensions(map_data, r, s)
 TotalT, map_data = ReplaceCountT(map_data)
@@ -319,10 +319,10 @@ n......
 T....Tn
 ..n...."""
 
-additional_lines = additional_input.strip().split("\n")
-additional_dimensions = list(map(int, additional_lines[0].split()))
+additional_rows = additional_input.strip().split("\n")
+additional_dimensions = list(map(int, additional_rows[0].split()))
 additional_r, additional_s = additional_dimensions[0], additional_dimensions[1]
-additional_map_data = additional_lines[1:]
+additional_map_data = additional_rows[1:]
 
 TestDimensions(additional_map_data, additional_r, additional_s)
 TotalT, additional_map_data = ReplaceCountT(additional_map_data)
