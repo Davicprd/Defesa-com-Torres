@@ -165,7 +165,7 @@ def FindHorizontalT(String, row_index, col_index, tower_row, index=0):
     - String: The map layout as a list of strings.
     - row_index: Index of the row in the map.
     - col_index: Index of the column in the map.
-    - total_towers: Total number of towers in the map.
+    - tower_row: Total number of towers in the map.
     - index: Index of the cannon (default: 0).
 
     Returns:
